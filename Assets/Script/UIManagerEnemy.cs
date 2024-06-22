@@ -10,7 +10,6 @@ public class UIManagerEnemy : MonoBehaviour
     public float animationDuration = 0.5f; // Durasi animasi tween
     public Transform enemy; // Referensi ke objek musuh
     public Vector3 offset; // Offset untuk posisi health bar di atas musuh
-    
 
     private bool isHealthBarVisible = false;
 
@@ -64,5 +63,20 @@ public class UIManagerEnemy : MonoBehaviour
     {
         healthBar.gameObject.SetActive(false);
         isHealthBarVisible = false;
+    }
+
+    public void SetHealth(int currentHealth, int maxHealth)
+    {
+        healthBar.maxValue = maxHealth;
+        healthBar.value = currentHealth;
+    }
+
+    public void UpdateHealthBar(int currentHealth, int maxHealth)
+    {
+        if (!isHealthBarVisible)
+        {
+            ShowHealthBar();
+        }
+        StartCoroutine(AnimateHealthBar(currentHealth));
     }
 }

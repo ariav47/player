@@ -46,7 +46,17 @@ public class EnemyController : MonoBehaviour
         currentHealth = maxHealth;
         StartCoroutine(Roaming());
 
-        uiManagerEnemy = FindObjectOfType<UIManagerEnemy>(); // Temukan UIManagerEnemy
+        // Make sure to find the UIManagerEnemy in the correct way
+        uiManagerEnemy = healthBars.GetComponent<UIManagerEnemy>();
+
+        if (uiManagerEnemy != null)
+        {
+            uiManagerEnemy.SetHealth(currentHealth, maxHealth);
+        }
+        else
+        {
+            Debug.LogWarning("UIManagerEnemy not found on healthBars.");
+        }
     }
 
     public bool _hasTarget = false;
@@ -138,7 +148,6 @@ public class EnemyController : MonoBehaviour
         if (collision.CompareTag("PlayerAttack")) // Assuming the player's attack collider has the tag "PlayerAttack"
         {
             Debug.Log("Enemy hit by PlayerAttack!");
-            // Adjust the damage amount as necessary
             TakeDamage(damageToTest);
 
             if (uiManagerEnemy != null)
@@ -159,6 +168,11 @@ public class EnemyController : MonoBehaviour
         currentHealth -= damage;
         Debug.Log("Enemy took damage, current health: " + currentHealth);
 
+        if (uiManagerEnemy != null)
+        {
+            uiManagerEnemy.UpdateHealthBar(currentHealth, maxHealth); // Update health bar
+        }
+
         if (currentHealth <= 0)
         {
             Die();
@@ -174,28 +188,18 @@ public class EnemyController : MonoBehaviour
         myAnim.SetBool("canMove", false);
         healthBars.SetActive(false);
         myAnim.SetBool("hasTarget", false);
-        // Add death animation trigger if needed
         myAnim.SetTrigger("death");
-        
-        // Start the coroutine to handle death
-        // StartCoroutine(HandleDeath());
+        // Add any additional death handling logic here
+
+        // Optionally, remove the enemy after a delay to allow death animation to play
+        StartCoroutine(RemoveAfterDelay(2f)); // Adjust delay as needed
     }
 
-    // private IEnumerator HandleDeath()
-    // {
-    //     // Wait for death animation to start
-    //     yield return new WaitForEndOfFrame();
-
-    //     // Get the length of the death animation
-    //     AnimatorStateInfo stateInfo = myAnim.GetCurrentAnimatorStateInfo(0);
-    //     float waitTime = stateInfo.length;
-
-    //     // Wait for the animation to finish
-    //     yield return new WaitForSeconds(waitTime);
-
-    //     // Disable the enemy game object
-    //     gameObject.SetActive(false);
-    // }
+    private IEnumerator RemoveAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Destroy(gameObject);
+    }
 
     public void RemoveEnemy()
     {
