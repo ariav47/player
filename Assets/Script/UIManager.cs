@@ -2,9 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class UIManager : MonoBehaviour
 {
+    [SerializeField] TextMeshProUGUI txtDiamonds, txtWinCondition;
+    [SerializeField] GameObject winCondition;
+    
     private HealthManager healthMan;
     public Slider healthBar;
     public float animationDuration = 0.5f; // Durasi animasi tween
@@ -40,5 +44,35 @@ public class UIManager : MonoBehaviour
         }
 
         healthBar.value = targetHealth;
+    }
+
+        private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            DestroyImmediate(this);
+        }
+    }
+
+    private static UIManager instance;
+
+    public static UIManager MyInstance
+    {
+        get
+        {
+            if (instance == null)
+                instance = new UIManager();
+
+            return instance;
+        }
+    }
+
+    public void UpdateDiamondUI(int _diamonds, int _winCondition)
+    {
+        txtDiamonds.text = _diamonds + " / " + _winCondition;
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    private int diamonds;
+    private int collectedDiamonds, winCondition = 3;
     
     private void Awake()
     {
@@ -31,9 +31,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
+    }
+
     public void AddDiamonds(int _diamonds)
     {
-        diamonds += _diamonds;
-        Debug.Log(diamonds);
+        collectedDiamonds += _diamonds;
+        UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
     }
 }
