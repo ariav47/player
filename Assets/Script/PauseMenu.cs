@@ -21,6 +21,21 @@ public class PauseMenu : MonoBehaviour
 
     public void Restart()
     {
+        // Reset HealthManager
+        HealthManager healthManager = FindObjectOfType<HealthManager>();
+        if (healthManager != null)
+        {
+            healthManager.Respawn();
+        }
+
+        // Reset UIManager health bar
+        UIManager uiManager = UIManager.MyInstance;
+        if (uiManager != null)
+        {
+            uiManager.ResetHealthBar();
+        }
+
+        // Reload the scene
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Time.timeScale = 1;
         pauseMenu.SetActive(false);

@@ -6,7 +6,7 @@ public class HealthManager : MonoBehaviour
     Vector2 startPos;
 
     public int currentHealth;
-    public int maxHealth;
+    public int maxHealth = 100;
 
     private bool flashActive;
     [SerializeField]
@@ -142,5 +142,16 @@ public class HealthManager : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         Debug.Log("Health changed from " + previousHealth + " to " + currentHealth); // Debug line
         UIManager.MyInstance.SetHealthBarValue(currentHealth); // Update health bar
+    }
+
+     private void Awake()
+    {
+        currentHealth = maxHealth;
+    }
+
+    public void ResetHealth()
+    {
+        currentHealth = maxHealth;
+        UIManager.MyInstance.SetHealthBarValue(currentHealth);
     }
 }

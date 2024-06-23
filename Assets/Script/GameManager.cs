@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
 {
     private int collectedDiamonds;
     [SerializeField] private int winCondition = 3;
+    [SerializeField] private SceneFader sceneFader; // Tambahkan ini
+    [SerializeField] private string nextSceneName; // Tambahkan ini untuk mengganti scene di inspector
 
     private static GameManager instance;
     public GameObject gameOverUI;
@@ -59,12 +61,24 @@ public class GameManager : MonoBehaviour
         Debug.Log("Finish method called");
         if (collectedDiamonds >= winCondition)
         {
-            Debug.Log("Collected Diamonds: " + collectedDiamonds + ". Loading Level 2.");
-            SceneManager.LoadScene("Level 2");
+            Debug.Log("Collected Items: " + collectedDiamonds + ". Loading " + nextSceneName);
+            if (sceneFader != null)
+            {
+                HealthManager healthManager = FindObjectOfType<HealthManager>();
+                if (healthManager != null)
+                {
+                    healthManager.ResetHealth();
+                }
+                sceneFader.FadeOutAndLoadScene(nextSceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(nextSceneName);
+            }
         }
         else
         {
-            Debug.Log("Not enough diamonds. Collected: " + collectedDiamonds + " / " + winCondition);
+            Debug.Log("Not enough Items. Collected: " + collectedDiamonds + " / " + winCondition);
             UIManager.MyInstance.ShowWinCondition(collectedDiamonds, winCondition);
         }
     }
@@ -96,6 +110,11 @@ public class GameManager : MonoBehaviour
     private IEnumerator ResetHealthAfterSceneLoad()
     {
         yield return null; // Wait for the scene to fully load
+        HealthManager healthManager = FindObjectOfType<HealthManager>();
+        if (healthManager != null)
+        {
+            healthManager.ResetHealth();
+        }
         UIManager.MyInstance.ResetHealthBar(); // Reset health bar value
     }
 
