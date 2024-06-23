@@ -89,6 +89,14 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f; // Resume the game
         gameOverUI.SetActive(false);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Restart the current scene
+
+        StartCoroutine(ResetHealthAfterSceneLoad()); // Reset health bar after the scene is loaded
+    }
+
+    private IEnumerator ResetHealthAfterSceneLoad()
+    {
+        yield return null; // Wait for the scene to fully load
+        UIManager.MyInstance.ResetHealthBar(); // Reset health bar value
     }
 
     public void LoadHomeScene()

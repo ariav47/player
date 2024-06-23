@@ -13,6 +13,33 @@ public class UIManager : MonoBehaviour
     public Slider healthBar;
     public float animationDuration = 0.5f; // Durasi animasi tween
 
+    private static UIManager instance;
+
+    public static UIManager MyInstance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindObjectOfType<UIManager>();
+            }
+            return instance;
+        }
+    }
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -46,29 +73,16 @@ public class UIManager : MonoBehaviour
         healthBar.value = targetHealth;
     }
 
-        private void Awake()
+    public void SetHealthBarValue(float value)
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            DestroyImmediate(this);
-        }
+        healthBar.value = value;
     }
 
-    private static UIManager instance;
-
-    public static UIManager MyInstance
+    public void ResetHealthBar()
     {
-        get
-        {
-            if (instance == null)
-                instance = new UIManager();
-
-            return instance;
-        }
+        healthMan = FindObjectOfType<HealthManager>(); // Reset reference to HealthManager
+        healthBar.maxValue = healthMan.maxHealth;
+        healthBar.value = healthMan.currentHealth;
     }
 
     public void UpdateDiamondUI(int _diamonds, int _winCondition)

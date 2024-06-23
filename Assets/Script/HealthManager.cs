@@ -30,6 +30,9 @@ public class HealthManager : MonoBehaviour
         {
             Debug.LogError("Animator component not found on the game object.");
         }
+
+        currentHealth = maxHealth;
+        UIManager.MyInstance.SetHealthBarValue(currentHealth); // Set health bar value initially
     }
 
     void Update()
@@ -86,6 +89,8 @@ public class HealthManager : MonoBehaviour
 
         Debug.Log("HurtPlayer called, currentHealth: " + currentHealth);
 
+        UIManager.MyInstance.SetHealthBarValue(currentHealth); // Update health bar
+
         if (currentHealth <= 0)
         {
             Debug.Log("Triggering player_death animation");
@@ -110,11 +115,12 @@ public class HealthManager : MonoBehaviour
         GameManager.MyInstance.GameOver();
     }
 
-    void Respawn()
+    public void Respawn()
     {
         transform.position = startPos;
-        currentHealth = maxHealth;
+        currentHealth = maxHealth; // Reset currentHealth to maxHealth
         Debug.Log("Player respawned.");
+        UIManager.MyInstance.SetHealthBarValue(currentHealth); // Update health bar
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -135,11 +141,6 @@ public class HealthManager : MonoBehaviour
         currentHealth += Mathf.RoundToInt(amount);
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         Debug.Log("Health changed from " + previousHealth + " to " + currentHealth); // Debug line
-        UpdateHealthBar();
-    }
-
-    private void UpdateHealthBar()
-    {
-        // Implement your health bar update logic here
+        UIManager.MyInstance.SetHealthBarValue(currentHealth); // Update health bar
     }
 }
