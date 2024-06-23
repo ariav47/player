@@ -105,8 +105,9 @@ public class HealthManager : MonoBehaviour
 
         // Add additional delay
         yield return new WaitForSeconds(respawnDelay);
-        // Respawn the player
-        Respawn();
+
+        // Call GameOver method on GameManager
+        GameManager.MyInstance.GameOver();
     }
 
     void Respawn()
@@ -126,7 +127,7 @@ public class HealthManager : MonoBehaviour
             collision.gameObject.SetActive(false);
         }
     }
-
+    
     private void Heal(float amount)
     {
         Debug.Log("Healing player by " + amount); // Debug line

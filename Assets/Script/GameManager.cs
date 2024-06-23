@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int winCondition = 3;
 
     private static GameManager instance;
+    public GameObject gameOverUI;
 
     public static GameManager MyInstance
     {
@@ -66,5 +67,33 @@ public class GameManager : MonoBehaviour
             Debug.Log("Not enough diamonds. Collected: " + collectedDiamonds + " / " + winCondition);
             UIManager.MyInstance.ShowWinCondition(collectedDiamonds, winCondition);
         }
+    }
+
+    public void GameOver()
+    {
+        Debug.Log("GameOver method called"); // Tambahkan log ini
+        if (gameOverUI != null)
+        {
+            Debug.Log("Activating gameOverUI"); // Tambahkan log ini
+            gameOverUI.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("gameOverUI is not set in the inspector"); // Tambahkan log ini
+        }
+        Time.timeScale = 0f; // Pause the game
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f; // Resume the game
+        gameOverUI.SetActive(false);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Restart the current scene
+    }
+
+    public void LoadHomeScene()
+    {
+        Time.timeScale = 1f; // Resume the game
+        SceneManager.LoadScene("Home"); // Replace "Home" with the actual name of your home scene
     }
 }
