@@ -1842,6 +1842,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 950964202367860085, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 80a50a0c4e374844c8de8312d4d8ff76, type: 2}
     - target: {fileID: 3246059778579168793, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
       propertyPath: m_Name
       value: Enemy 2
@@ -1858,29 +1862,37 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4529206083012320539, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 2107450010, guid: be9baede9c4fc06499120f2c87cae54c, type: 3}
     - target: {fileID: 4624411730749155552, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
       propertyPath: speed
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4624411730749155552, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
       propertyPath: maxHealth
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 4624411730749155552, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
       propertyPath: damageToTest
-      value: 5
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4624411730749155552, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
       propertyPath: currentHealth
-      value: 100
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 6007657804513585146, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
+      propertyPath: damageToGive
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 6702998535543480815, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.4
+      value: -9.24
       objectReference: {fileID: 0}
     - target: {fileID: 6702998535543480815, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -7.95
+      value: -4.55
       objectReference: {fileID: 0}
     - target: {fileID: 6702998535543480815, guid: 68bb6cc596811234f9cc22657919a66c, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1929,11 +1941,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2944980636797323733, guid: c144d8d60ae0a5842b76718bb12e382d, type: 3}
       propertyPath: maxHealth
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 2944980636797323733, guid: c144d8d60ae0a5842b76718bb12e382d, type: 3}
       propertyPath: currentHealth
-      value: 100
+      value: 150
       objectReference: {fileID: 0}
     - target: {fileID: 3530103681121582769, guid: c144d8d60ae0a5842b76718bb12e382d, type: 3}
       propertyPath: runSpeed

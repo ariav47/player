@@ -175,6 +175,7 @@ public class EnemyController : MonoBehaviour
 
         if (currentHealth <= 0)
         {
+            Debug.Log("Calling Die method");
             Die();
         }
 
@@ -192,12 +193,15 @@ public class EnemyController : MonoBehaviour
         // Add any additional death handling logic here
 
         // Optionally, remove the enemy after a delay to allow death animation to play
+        Debug.Log("Starting RemoveAfterDelay Coroutine");
         StartCoroutine(RemoveAfterDelay(2f)); // Adjust delay as needed
     }
 
     private IEnumerator RemoveAfterDelay(float delay)
     {
+        Debug.Log("Starting RemoveAfterDelay Coroutine");
         yield return new WaitForSeconds(delay);
+        Debug.Log("Removing Enemy GameObject");
         Destroy(gameObject);
     }
 
