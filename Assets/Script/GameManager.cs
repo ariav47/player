@@ -7,11 +7,11 @@ public class GameManager : MonoBehaviour
 {
     private int collectedDiamonds;
     [SerializeField] private int winCondition = 3;
-    [SerializeField] private SceneFader sceneFader; // Tambahkan ini
-    [SerializeField] private string nextSceneName; // Tambahkan ini untuk mengganti scene di inspector
+    [SerializeField] private string nextScene; // Next scene name
 
     private static GameManager instance;
     public GameObject gameOverUI;
+    [SerializeField] private SceneFader sceneFader;
 
     public static GameManager MyInstance
     {
@@ -47,6 +47,37 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        SetWinConditionForLevel();
+        UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
+    }
+
+    private void SetWinConditionForLevel()
+    {
+        // Reset collected diamonds
+        collectedDiamonds = 0;
+
+        // Set win condition and next scene based on the current level
+        switch (SceneManager.GetActiveScene().name)
+        {
+            case "Char":
+                winCondition = 3;
+                nextScene = "Level 2";
+                break;
+            case "Level 2":
+                winCondition = 5;
+                nextScene = "Level 3";
+                break;
+            case "Level 3":
+                winCondition = 7;
+                // nextScene = ""; // Set next scene for level 3
+                break;
+            default:
+                winCondition = 3;
+                nextScene = "Char"; // Default next scene
+                break;
+        }
+        
+        Debug.Log("Current Scene: " + SceneManager.GetActiveScene().name + ", Win Condition: " + winCondition + ", Next Scene: " + nextScene);
         UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
     }
 
@@ -61,15 +92,8 @@ public class GameManager : MonoBehaviour
         Debug.Log("Finish method called");
         if (collectedDiamonds >= winCondition)
         {
-            Debug.Log("Collected Items: " + collectedDiamonds + ". Loading " + nextSceneName);
-            if (sceneFader != null)
-            {
-                sceneFader.FadeOutAndLoadScene(nextSceneName);
-            }
-            else
-            {
-                SceneManager.LoadScene(nextSceneName);
-            }
+            Debug.Log("Collected Items: " + collectedDiamonds + ". Loading " + nextScene);
+            sceneFader.FadeOutAndLoadScene(nextScene);
         }
         else
         {
@@ -112,5 +136,11 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f; // Resume the game
         SceneManager.LoadScene("Home"); // Replace "Home" with the actual name of your home scene
+    }
+
+    private void OnLevelWasLoaded(int level)
+    {
+        SetWinConditionForLevel();
+        UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
     }
 }

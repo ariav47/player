@@ -93,7 +93,7 @@ public class UIManager : MonoBehaviour
     public void ShowWinCondition(int _diamonds, int _winCondition)
     {
         winCondition.SetActive(true);
-        // txtWinCondition.text = "You need " + (_winCondition - _diamonds) + " more Diamonds";
+        txtWinCondition.text = "You need " + (_winCondition - _diamonds) + " more items"; // Update this line
     }
 
     public void HideWinCondition()
