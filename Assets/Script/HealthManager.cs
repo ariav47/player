@@ -20,6 +20,10 @@ public class HealthManager : MonoBehaviour
     [SerializeField]
     private float respawnDelay = 1f; // Waktu delay tambahan setelah animasi kematian selesai
 
+    private AudioSource audioSource; // Tambahkan referensi ke AudioSource
+    [SerializeField] 
+    private AudioClip healSound; // Tambahkan referensi ke AudioClip melalui SerializeField
+
     void Start()
     {
         startPos = transform.position;
@@ -29,6 +33,12 @@ public class HealthManager : MonoBehaviour
         if (animator == null)
         {
             Debug.LogError("Animator component not found on the game object.");
+        }
+
+        audioSource = GetComponent<AudioSource>(); // Inisialisasi AudioSource
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource component not found on the game object.");
         }
 
         currentHealth = maxHealth;
@@ -129,6 +139,13 @@ public class HealthManager : MonoBehaviour
         if (collision.CompareTag("Health"))
         {
             Debug.Log("Collision with Health item detected"); // Debug line
+
+            // Putar suara jika ada AudioSource dan AudioClip
+            if (audioSource != null && healSound != null)
+            {
+                audioSource.PlayOneShot(healSound);
+            }
+
             Heal(healthAmount);
             collision.gameObject.SetActive(false);
         }
@@ -144,7 +161,7 @@ public class HealthManager : MonoBehaviour
         UIManager.MyInstance.SetHealthBarValue(currentHealth); // Update health bar
     }
 
-     private void Awake()
+    private void Awake()
     {
         currentHealth = maxHealth;
     }

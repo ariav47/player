@@ -1199,6 +1199,10 @@ PrefabInstance:
       propertyPath: nextScene
       value: Level 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6575448977519607094, guid: 0277c8c6e9481d64f9e5638741c1a87f, type: 3}
+      propertyPath: diamondCollectSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 905cb1b247b1db04597b2d905214c3a3, type: 3}
     - target: {fileID: 7452541896563608402, guid: 0277c8c6e9481d64f9e5638741c1a87f, type: 3}
       propertyPath: m_fontSize
       value: 60
@@ -1519,7 +1523,7 @@ Transform:
   m_GameObject: {fileID: 1569016804}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -23.1, y: -0.4, z: -10}
+  m_LocalPosition: {x: -20.32, y: 19.5, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1864,6 +1868,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2944980636797323733, guid: c144d8d60ae0a5842b76718bb12e382d, type: 3}
+      propertyPath: healSound
+      value: 
+      objectReference: {fileID: 8300000, guid: c20148939fc0ba142b3c576f466c6185, type: 3}
+    - target: {fileID: 2944980636797323733, guid: c144d8d60ae0a5842b76718bb12e382d, type: 3}
       propertyPath: maxHealth
       value: 100
       objectReference: {fileID: 0}
@@ -1893,11 +1901,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6944043746186865062, guid: c144d8d60ae0a5842b76718bb12e382d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -23.1
+      value: -20.32
       objectReference: {fileID: 0}
     - target: {fileID: 6944043746186865062, guid: c144d8d60ae0a5842b76718bb12e382d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.4
+      value: 19.5
       objectReference: {fileID: 0}
     - target: {fileID: 6944043746186865062, guid: c144d8d60ae0a5842b76718bb12e382d, type: 3}
       propertyPath: m_LocalPosition.z
@@ -6142,6 +6150,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1279410426}
     m_Modifications:
+    - target: {fileID: 3933821996876358502, guid: ce25076aa191ad14fb753d3bb55f70e2, type: 3}
+      propertyPath: collectSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 905cb1b247b1db04597b2d905214c3a3, type: 3}
     - target: {fileID: 4448493525772420024, guid: ce25076aa191ad14fb753d3bb55f70e2, type: 3}
       propertyPath: m_Name
       value: Diamond
@@ -6211,13 +6223,17 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2415877361238504345, guid: a17cff08369b24f4e822e1ce77a93e15, type: 3}
+      propertyPath: m_Volume
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5662624337213021169, guid: a17cff08369b24f4e822e1ce77a93e15, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -18.636955
+      value: -18.739302
       objectReference: {fileID: 0}
     - target: {fileID: 5662624337213021169, guid: a17cff08369b24f4e822e1ce77a93e15, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.39273998
+      value: 19.50257
       objectReference: {fileID: 0}
     - target: {fileID: 5662624337213021169, guid: a17cff08369b24f4e822e1ce77a93e15, type: 3}
       propertyPath: m_LocalPosition.z

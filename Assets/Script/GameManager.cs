@@ -13,6 +13,9 @@ public class GameManager : MonoBehaviour
     public GameObject gameOverUI;
     [SerializeField] private SceneFader sceneFader;
 
+    [SerializeField] private AudioClip diamondCollectSound; // Tambahkan referensi ke AudioClip melalui SerializeField
+    private AudioSource audioSource; // Tambahkan referensi ke AudioSource
+
     public static GameManager MyInstance
     {
         get
@@ -42,6 +45,12 @@ public class GameManager : MonoBehaviour
         else if (instance != this)
         {
             DestroyImmediate(gameObject);
+        }
+
+        audioSource = GetComponent<AudioSource>(); // Inisialisasi AudioSource
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>(); // Tambahkan AudioSource jika tidak ada
         }
     }
 
@@ -76,7 +85,7 @@ public class GameManager : MonoBehaviour
                 nextScene = "Char"; // Default next scene
                 break;
         }
-        
+
         Debug.Log("Current Scene: " + SceneManager.GetActiveScene().name + ", Win Condition: " + winCondition + ", Next Scene: " + nextScene);
         UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
     }
@@ -85,6 +94,23 @@ public class GameManager : MonoBehaviour
     {
         collectedDiamonds += _diamonds;
         UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
+
+        // Putar suara jika ada AudioSource dan AudioClip
+        if (audioSource != null && diamondCollectSound != null)
+        {
+            audioSource.PlayOneShot(diamondCollectSound);
+        }
+        else
+        {
+            if (audioSource == null)
+            {
+                Debug.LogError("AudioSource is not set.");
+            }
+            if (diamondCollectSound == null)
+            {
+                Debug.LogError("diamondCollectSound is not set.");
+            }
+        }
     }
 
     public void Finish()
