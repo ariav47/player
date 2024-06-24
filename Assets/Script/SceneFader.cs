@@ -14,10 +14,15 @@ public class SceneFader : MonoBehaviour
         {
             Debug.LogError("Fade Image is not set in the inspector.");
         }
+        else
+        {
+            fadeImage.gameObject.SetActive(false); // Nonaktifkan fadeImage saat game dimulai
+        }
     }
 
     public void FadeOutAndLoadScene(string sceneName)
     {
+        fadeImage.gameObject.SetActive(true); // Aktifkan fadeImage saat fade out dimulai
         StartCoroutine(FadeOut(sceneName));
     }
 
@@ -52,6 +57,7 @@ public class SceneFader : MonoBehaviour
         }
         color.a = 0f;
         fadeImage.color = color;
+        fadeImage.gameObject.SetActive(false); // Nonaktifkan fadeImage setelah fade in selesai
 
         // Reset health after fade in
         HealthManager healthManager = FindObjectOfType<HealthManager>();

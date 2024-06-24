@@ -64,11 +64,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("Collected Items: " + collectedDiamonds + ". Loading " + nextSceneName);
             if (sceneFader != null)
             {
-                HealthManager healthManager = FindObjectOfType<HealthManager>();
-                if (healthManager != null)
-                {
-                    healthManager.ResetHealth();
-                }
                 sceneFader.FadeOutAndLoadScene(nextSceneName);
             }
             else
@@ -110,11 +105,6 @@ public class GameManager : MonoBehaviour
     private IEnumerator ResetHealthAfterSceneLoad()
     {
         yield return null; // Wait for the scene to fully load
-        HealthManager healthManager = FindObjectOfType<HealthManager>();
-        if (healthManager != null)
-        {
-            healthManager.ResetHealth();
-        }
         UIManager.MyInstance.ResetHealthBar(); // Reset health bar value
     }
 
