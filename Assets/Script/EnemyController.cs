@@ -39,6 +39,11 @@ public class EnemyController : MonoBehaviour
     // Damage amount to test
     public int damageToTest = 10;
 
+    // Audio variables
+    private AudioSource audioSource;
+    [SerializeField]
+    private AudioClip attackSound;
+
     void Start()
     {
         myAnim = GetComponent<Animator>();
@@ -62,6 +67,13 @@ public class EnemyController : MonoBehaviour
         if (attackZone != null)
         {
             attackZone.onPlayerAttackDetected += HandlePlayerAttackDetected;
+        }
+
+        // Initialize AudioSource
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource component not found on the game object.");
         }
     }
 
@@ -153,6 +165,17 @@ public class EnemyController : MonoBehaviour
         {
             myAnim.SetTrigger("attack");
             Debug.Log("Enemy is attacking!");
+
+            // Play attack sound
+            if (audioSource != null && attackSound != null)
+            {
+                Debug.Log("Playing attack sound"); // Debug line
+                audioSource.PlayOneShot(attackSound);
+            }
+            else
+            {
+                Debug.LogWarning("AudioSource or AttackSound is missing."); // Debug line
+            }
         }
     }
 
