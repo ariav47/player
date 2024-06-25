@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,20 +8,23 @@ public class DetectionZone : MonoBehaviour
 
     private void Awake()
     {
-        // Initialize list of detected colliders
+        detectedColliders = new List<Collider2D>();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        detectedColliders.Add(collision);
-        if (collision.CompareTag("PlayerAttack"))
+        if (collision.CompareTag("Player"))
         {
+            detectedColliders.Add(collision);
             onPlayerAttackDetected?.Invoke(collision);
         }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        detectedColliders.Remove(collision);
+        if (collision.CompareTag("Player"))
+        {
+            detectedColliders.Remove(collision);
+        }
     }
 }

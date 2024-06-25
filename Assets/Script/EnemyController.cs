@@ -57,6 +57,12 @@ public class EnemyController : MonoBehaviour
         {
             Debug.LogWarning("UIManagerEnemy not found on healthBars.");
         }
+
+        // Subscribe to the attack detection event
+        if (attackZone != null)
+        {
+            attackZone.onPlayerAttackDetected += HandlePlayerAttackDetected;
+        }
     }
 
     public bool _hasTarget = false;
@@ -141,6 +147,15 @@ public class EnemyController : MonoBehaviour
         roamingPosition = new Vector3(randomX, randomY, transform.position.z);
     }
 
+    private void HandlePlayerAttackDetected(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            myAnim.SetTrigger("attack");
+            Debug.Log("Enemy is attacking!");
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         Debug.Log("OnTriggerEnter2D called with: " + collision.gameObject.tag);
@@ -208,5 +223,13 @@ public class EnemyController : MonoBehaviour
     public void RemoveEnemy()
     {
         Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        if (attackZone != null)
+        {
+            attackZone.onPlayerAttackDetected -= HandlePlayerAttackDetected;
+        }
     }
 }

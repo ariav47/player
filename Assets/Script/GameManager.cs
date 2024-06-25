@@ -77,8 +77,8 @@ public class GameManager : MonoBehaviour
                 nextScene = "Level 3";
                 break;
             case "Level 3":
-                winCondition = 7;
-                // nextScene = ""; // Set next scene for level 3
+                winCondition = 3;
+                nextScene = "Ending"; // Set next scene for level 3
                 break;
             default:
                 winCondition = 3;
