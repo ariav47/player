@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
@@ -38,6 +39,21 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        ResetHealthBar();
     }
 
     // Start is called before the first frame update
@@ -81,8 +97,11 @@ public class UIManager : MonoBehaviour
     public void ResetHealthBar()
     {
         healthMan = FindObjectOfType<HealthManager>(); // Reset reference to HealthManager
-        healthBar.maxValue = healthMan.maxHealth;
-        healthBar.value = healthMan.currentHealth;
+        if (healthMan != null)
+        {
+            healthBar.maxValue = healthMan.maxHealth;
+            healthBar.value = healthMan.currentHealth;
+        }
     }
 
     public void UpdateDiamondUI(int _diamonds, int _winCondition)
@@ -99,5 +118,5 @@ public class UIManager : MonoBehaviour
     public void HideWinCondition()
     {
         winCondition.SetActive(false);
-    }    
+    }
 }

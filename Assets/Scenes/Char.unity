@@ -1748,6 +1748,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4505887574909281207, guid: 0277c8c6e9481d64f9e5638741c1a87f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5662070631917435587, guid: 0277c8c6e9481d64f9e5638741c1a87f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 369
@@ -1760,6 +1764,10 @@ PrefabInstance:
       propertyPath: diamondCollectSound
       value: 
       objectReference: {fileID: 8300000, guid: 905cb1b247b1db04597b2d905214c3a3, type: 3}
+    - target: {fileID: 6912479585408423937, guid: 0277c8c6e9481d64f9e5638741c1a87f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7452541896563608402, guid: 0277c8c6e9481d64f9e5638741c1a87f, type: 3}
       propertyPath: m_fontSize
       value: 60

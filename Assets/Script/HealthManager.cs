@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class HealthManager : MonoBehaviour
 {
@@ -43,6 +44,22 @@ public class HealthManager : MonoBehaviour
 
         currentHealth = maxHealth;
         UIManager.MyInstance.SetHealthBarValue(currentHealth); // Set health bar value initially
+    }
+
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Reset health bar setiap kali scene baru dimuat
+        UIManager.MyInstance.ResetHealthBar();
     }
 
     void Update()
@@ -150,7 +167,7 @@ public class HealthManager : MonoBehaviour
             collision.gameObject.SetActive(false);
         }
     }
-    
+
     private void Heal(float amount)
     {
         Debug.Log("Healing player by " + amount); // Debug line
