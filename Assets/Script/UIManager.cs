@@ -9,10 +9,13 @@ public class UIManager : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI txtDiamonds, txtWinCondition;
     [SerializeField] GameObject winCondition;
-    
+
     private HealthManager healthMan;
     public Slider healthBar;
     public float animationDuration = 0.5f; // Durasi animasi tween
+
+    [SerializeField] private Image diamondImage; // Tambahkan referensi ke Image untuk diamond
+    [SerializeField] private Sprite[] diamondSprites; // Tambahkan array untuk menyimpan gambar diamond untuk setiap scene
 
     private static UIManager instance;
 
@@ -53,7 +56,9 @@ public class UIManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        Debug.Log("Scene loaded: " + scene.name); // Debug line
         ResetHealthBar();
+        UpdateDiamondImage(scene.name);
     }
 
     // Start is called before the first frame update
@@ -62,6 +67,7 @@ public class UIManager : MonoBehaviour
         healthMan = FindObjectOfType<HealthManager>();
         healthBar.maxValue = healthMan.maxHealth;
         healthBar.value = healthMan.currentHealth;
+        UpdateDiamondImage(SceneManager.GetActiveScene().name); // Update diamond image at start
     }
 
     // Update is called once per frame
@@ -118,5 +124,26 @@ public class UIManager : MonoBehaviour
     public void HideWinCondition()
     {
         winCondition.SetActive(false);
+    }
+
+    private void UpdateDiamondImage(string sceneName)
+    {
+        Debug.Log("Updating diamond image for scene: " + sceneName); // Debug line
+        switch (sceneName)
+        {
+            case "Char":
+                diamondImage.sprite = diamondSprites[0];
+                break;
+            case "Level 2":
+                diamondImage.sprite = diamondSprites[1];
+                break;
+            case "Level 3":
+                diamondImage.sprite = diamondSprites[2];
+                break;
+            default:
+                diamondImage.sprite = diamondSprites[0];
+                break;
+        }
+        Debug.Log("Diamond image updated to: " + diamondImage.sprite.name); // Debug line
     }
 }

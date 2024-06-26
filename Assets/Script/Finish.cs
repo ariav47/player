@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Finish : MonoBehaviour
 {
@@ -8,7 +9,16 @@ public class Finish : MonoBehaviour
     {
         if (collision.tag == "Player")
         {
-            GameManager.MyInstance.Finish();
+            // Periksa nama adegan saat ini
+            if (SceneManager.GetActiveScene().name == "Ending")
+            {
+                // Panggil metode LoadHomeScene jika adegan saat ini adalah "Ending"
+                GameManager.MyInstance.LoadHomeScene();
+            }
+            else
+            {
+                GameManager.MyInstance.Finish();
+            }
         }
     }
 

@@ -80,10 +80,14 @@ public class GameManager : MonoBehaviour
                 winCondition = 3;
                 nextScene = "Ending"; // Set next scene for level 3
                 break;
-            default:
-                winCondition = 3;
-                nextScene = "Char"; // Default next scene
+            case "Ending":
+                winCondition = 0;
+                nextScene = "Home"; // Set next scene for level 3
                 break;
+            // default:
+            //     winCondition = 3;
+            //     nextScene = "Char"; // Default next scene
+            //     break;
         }
 
         Debug.Log("Current Scene: " + SceneManager.GetActiveScene().name + ", Win Condition: " + winCondition + ", Next Scene: " + nextScene);
