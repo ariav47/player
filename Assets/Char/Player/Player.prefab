@@ -284,6 +284,8 @@ MonoBehaviour:
   runSpeed: 3.5
   comboDelay: 0
   attackSound: {fileID: 8300000, guid: d39c669e302a3604fb1e921d9112b2e4, type: 3}
+  slideSpeed: 10
+  slideDuration: 0.5
   _isFacingRight: 1
 --- !u!114 &1621616050686829097
 MonoBehaviour:
@@ -386,6 +388,22 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 8f59b281-15e2-449f-8cfd-8662d9e97e83
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 6568016571673823876}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: ff33f8f9-69ba-45aa-abdc-5beca0ea65c6
+    m_ActionName: Player/Slide[/Keyboard/space]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -428,6 +446,7 @@ MonoBehaviour:
   maxHealth: 50
   healthAmount: 20
   respawnDelay: 1
+  healSound: {fileID: 0}
 --- !u!70 &8886463918598606780
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
