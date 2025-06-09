@@ -166,6 +166,16 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f; // Resume the game
         SceneManager.LoadScene("Home"); // Replace "Home" with the actual name of your home scene
+        gameOverUI.SetActive(false);
+        GameObject canvas = GameObject.Find("Canvas"); // Ganti "Canvas" dengan nama GameObject yang berisi UI yang ingin dinonaktifkan
+        if (canvas != null)
+        {
+            canvas.SetActive(false);
+        }
+        else
+        {
+            Debug.LogWarning("Canvas object not found in Home scene.");
+        }
     }
 
     private void OnLevelWasLoaded(int level)

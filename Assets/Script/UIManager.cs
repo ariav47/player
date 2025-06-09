@@ -7,16 +7,15 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] TextMeshProUGUI txtDiamonds, txtWinCondition;
-    [SerializeField] GameObject winCondition;
+    [SerializeField] private TextMeshProUGUI txtDiamonds;
+    [SerializeField] private GameObject winCondition;
+    [SerializeField] private TextMeshProUGUI txtWinCondition;
+    [SerializeField] private Slider healthBar;
+    [SerializeField] private float animationDuration = 0.5f;
+    [SerializeField] private Image diamondImage;
+    [SerializeField] private Sprite[] diamondSprites;
 
     private HealthManager healthMan;
-    public Slider healthBar;
-    public float animationDuration = 0.5f; // Durasi animasi tween
-
-    [SerializeField] private Image diamondImage; // Tambahkan referensi ke Image untuk diamond
-    [SerializeField] private Sprite[] diamondSprites; // Tambahkan array untuk menyimpan gambar diamond untuk setiap scene
-
     private static UIManager instance;
 
     public static UIManager MyInstance
@@ -56,25 +55,26 @@ public class UIManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log("Scene loaded: " + scene.name); // Debug line
+        Debug.Log("Scene loaded: " + scene.name);
         ResetHealthBar();
         UpdateDiamondImage(scene.name);
+        HideWinCondition(); // Pastikan win condition tersembunyi setiap kali scene dimuat ulang
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         healthMan = FindObjectOfType<HealthManager>();
-        healthBar.maxValue = healthMan.maxHealth;
-        healthBar.value = healthMan.currentHealth;
-        UpdateDiamondImage(SceneManager.GetActiveScene().name); // Update diamond image at start
+        if (healthMan != null)
+        {
+            healthBar.maxValue = healthMan.maxHealth;
+            healthBar.value = healthMan.currentHealth;
+        }
+        UpdateDiamondImage(SceneManager.GetActiveScene().name);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // Hanya lakukan tweening jika nilai health berubah
-        if (healthBar.value != healthMan.currentHealth)
+        if (healthMan != null && healthBar.value != healthMan.currentHealth)
         {
             StartCoroutine(AnimateHealthBar(healthMan.currentHealth));
         }
@@ -83,12 +83,12 @@ public class UIManager : MonoBehaviour
     private IEnumerator AnimateHealthBar(float targetHealth)
     {
         float startHealth = healthBar.value;
-        float elapsed = 0f;
+        float timer = 0f;
 
-        while (elapsed < animationDuration)
+        while (timer < animationDuration)
         {
-            elapsed += Time.deltaTime;
-            healthBar.value = Mathf.Lerp(startHealth, targetHealth, elapsed / animationDuration);
+            timer += Time.deltaTime;
+            healthBar.value = Mathf.Lerp(startHealth, targetHealth, timer / animationDuration);
             yield return null;
         }
 
@@ -102,7 +102,6 @@ public class UIManager : MonoBehaviour
 
     public void ResetHealthBar()
     {
-        healthMan = FindObjectOfType<HealthManager>(); // Reset reference to HealthManager
         if (healthMan != null)
         {
             healthBar.maxValue = healthMan.maxHealth;
@@ -118,7 +117,7 @@ public class UIManager : MonoBehaviour
     public void ShowWinCondition(int _diamonds, int _winCondition)
     {
         winCondition.SetActive(true);
-        txtWinCondition.text = "You need " + (_winCondition - _diamonds) + " more items"; // Update this line
+        txtWinCondition.text = "You need " + (_winCondition - _diamonds) + " more items";
     }
 
     public void HideWinCondition()
@@ -128,22 +127,25 @@ public class UIManager : MonoBehaviour
 
     private void UpdateDiamondImage(string sceneName)
     {
-        Debug.Log("Updating diamond image for scene: " + sceneName); // Debug line
         switch (sceneName)
         {
             case "Char":
-                diamondImage.sprite = diamondSprites[0];
+                if (diamondSprites.Length > 0)
+                    diamondImage.sprite = diamondSprites[0];
                 break;
             case "Level 2":
-                diamondImage.sprite = diamondSprites[1];
+                if (diamondSprites.Length > 1)
+                    diamondImage.sprite = diamondSprites[1];
                 break;
             case "Level 3":
-                diamondImage.sprite = diamondSprites[2];
+                if (diamondSprites.Length > 2)
+                    diamondImage.sprite = diamondSprites[2];
                 break;
             default:
-                diamondImage.sprite = diamondSprites[0];
+                if (diamondSprites.Length > 0)
+                    diamondImage.sprite = diamondSprites[0];
                 break;
         }
-        Debug.Log("Diamond image updated to: " + diamondImage.sprite.name); // Debug line
+        Debug.Log("Diamond image updated to: " + diamondImage.sprite.name);
     }
 }
