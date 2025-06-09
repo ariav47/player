@@ -5,6 +5,12 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    // --- Letakkan ini di bagian atas class PlayerController ---
+    [Header("Combat Stats")]
+    public float baseDamage = 10f;
+    [SerializeField] private float bonusDamage = 0f;
+    public float TotalDamage { get { return baseDamage + bonusDamage; } }
+
     public float runSpeed = 5f;
     Vector2 moveInput;
     private bool _isAttacking = false;
@@ -90,8 +96,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    // ##########################################################
-
 
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -184,5 +188,22 @@ public class PlayerController : MonoBehaviour
         public static string isSliding = "isSliding";
         public static string canMove = "canMove";
         public static string attackTrigger = "Attack";
+    }
+
+    // --- Letakkan method ini di dalam class PlayerController ---
+    public void ApplyDamageBuff(float damageAmount, float buffDuration)
+    {
+        StartCoroutine(DamageBuffCoroutine(damageAmount, buffDuration));
+    }
+
+    private IEnumerator DamageBuffCoroutine(float damageToAdd, float duration)
+    {
+        bonusDamage += damageToAdd;
+        Debug.Log("DAMAGE UP! Total Damage: " + TotalDamage + " selama " + duration + " detik.");
+
+        yield return new WaitForSeconds(duration);
+
+        bonusDamage -= damageToAdd;
+        Debug.Log("Buff selesai. Total Damage kembali ke normal: " + TotalDamage);
     }
 }

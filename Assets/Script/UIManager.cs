@@ -67,16 +67,16 @@ public class UIManager : MonoBehaviour
         if (healthMan != null)
         {
             healthBar.maxValue = healthMan.maxHealth;
-            healthBar.value = healthMan.currentHealth;
+            healthBar.value = healthMan.CurrentHealth;
         }
         UpdateDiamondImage(SceneManager.GetActiveScene().name);
     }
 
     void Update()
     {
-        if (healthMan != null && healthBar.value != healthMan.currentHealth)
+        if (healthMan != null && healthBar.value != healthMan.CurrentHealth)
         {
-            StartCoroutine(AnimateHealthBar(healthMan.currentHealth));
+            StartCoroutine(AnimateHealthBar(healthMan.CurrentHealth));
         }
     }
 
@@ -95,9 +95,15 @@ public class UIManager : MonoBehaviour
         healthBar.value = targetHealth;
     }
 
-    public void SetHealthBarValue(float value)
+    public void SetHealthBarValue(int CurrentHealth, int maxHealth)
     {
-        healthBar.value = value;
+        if (healthBar != null)
+        {
+            // Atur nilai maksimum slider sesuai maxHealth
+            healthBar.maxValue = maxHealth;
+            // Atur nilai slider saat ini
+            healthBar.value = CurrentHealth;
+        }
     }
 
     public void ResetHealthBar()
@@ -105,7 +111,7 @@ public class UIManager : MonoBehaviour
         if (healthMan != null)
         {
             healthBar.maxValue = healthMan.maxHealth;
-            healthBar.value = healthMan.currentHealth;
+            healthBar.value = healthMan.CurrentHealth;
         }
     }
 

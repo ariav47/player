@@ -183,11 +183,30 @@ public class EnemyController : MonoBehaviour
     {
         Debug.Log("OnTriggerEnter2D called with: " + collision.gameObject.tag);
 
-        if (collision.CompareTag("PlayerAttack")) // Assuming the player's attack collider has the tag "PlayerAttack"
+        if (collision.CompareTag("PlayerAttack"))
         {
             Debug.Log("Enemy hit by PlayerAttack!");
-            TakeDamage(damageToTest);
-
+        
+            // Langkah 1: Dapatkan referensi ke skrip PlayerController dari objek yang menyerang kita
+            PlayerController player = collision.GetComponentInParent<PlayerController>();
+        
+            // Langkah 2: Lakukan pengecekan apakah player ditemukan
+            if (player != null)
+            {
+                // Langkah 3: Ambil nilai TotalDamage dari player dan bulatkan ke integer
+                int damageToTake = Mathf.RoundToInt(player.TotalDamage);
+                
+                // Langkah 4: Panggil method TakeDamage dengan nilai damage dari player
+                TakeDamage(damageToTake);
+        
+                Debug.Log("Enemy receiving " + damageToTake + " damage from Player.");
+            }
+            else
+            {
+                // Ini adalah fallback jika PlayerController tidak ditemukan, bisa pakai damage default
+                Debug.LogWarning("PlayerAttack hit, but PlayerController component was not found in parents. Using default damage.");
+                TakeDamage(damageToTest);
+            }
             if (uiManagerEnemy != null)
             {
                 uiManagerEnemy.ShowHealthBar(); // Show health bar when attacked

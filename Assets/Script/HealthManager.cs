@@ -4,188 +4,125 @@ using UnityEngine.SceneManagement;
 
 public class HealthManager : MonoBehaviour
 {
-    Vector2 startPos;
-
-    public int currentHealth;
+    [Header("Health Settings")]
     public int maxHealth = 100;
+    private int _currentHealth;
+    public int CurrentHealth { get { return _currentHealth; } }
 
-    private bool flashActive;
-    [SerializeField]
-    private float healthAmount;
-    private float flashLength = 0f;
-    private float flashCounter = 0f;
+    [Header("Invincibility & Flash")]
+    [SerializeField] private float invincibilityDuration = 1f;
+    [SerializeField] private float flashDelay = 0.1f;
     private SpriteRenderer playerSprite;
+    private bool isInvincible = false;
+
+    [Header("Death & Respawn")]
+    [SerializeField] private float respawnDelay = 1f;
+    private Vector2 startPos;
+    
+    [Header("Audio")]
+    [SerializeField] private AudioClip healSound;
+    [SerializeField] private AudioClip hurtSound;
+    private AudioSource audioSource;
 
     private Animator animator;
 
-    [SerializeField]
-    private float respawnDelay = 1f; // Waktu delay tambahan setelah animasi kematian selesai
-
-    private AudioSource audioSource; // Tambahkan referensi ke AudioSource
-    [SerializeField] 
-    private AudioClip healSound; // Tambahkan referensi ke AudioClip melalui SerializeField
-
-    void Start()
+    private void Awake()
     {
-        startPos = transform.position;
-
+        // Semua inisialisasi komponen di satu tempat
         playerSprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
-        if (animator == null)
-        {
-            Debug.LogError("Animator component not found on the game object.");
-        }
+        audioSource = GetComponent<AudioSource>();
 
-        audioSource = GetComponent<AudioSource>(); // Inisialisasi AudioSource
-        if (audioSource == null)
-        {
-            Debug.LogError("AudioSource component not found on the game object.");
-        }
-
-        currentHealth = maxHealth;
-        UIManager.MyInstance.SetHealthBarValue(currentHealth); // Set health bar value initially
+        if (animator == null) Debug.LogError("Animator component not found!");
+        if (audioSource == null) Debug.LogError("AudioSource component not found!");
     }
 
-    void OnEnable()
+    private void Start()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        // Reset health bar setiap kali scene baru dimuat
-        UIManager.MyInstance.ResetHealthBar();
-    }
-
-    void Update()
-    {
-        if (flashActive)
-        {
-            HandleFlash();
-        }
-    }
-
-    private void HandleFlash()
-    {
-        if (flashCounter > flashLength * .99f)
-        {
-            playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 0f);
-        }
-        else if (flashCounter > flashLength * .82f)
-        {
-            playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 1f);
-        }
-        else if (flashCounter > flashLength * .66f)
-        {
-            playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 0f);
-        }
-        else if (flashCounter > flashLength * .49f)
-        {
-            playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 1f);
-        }
-        else if (flashCounter > flashLength * .33f)
-        {
-            playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 0f);
-        }
-        else if (flashCounter > flashLength * .16f)
-        {
-            playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 1f);
-        }
-        else if (flashCounter > 0f)
-        {
-            playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 0f);
-        }
-        else
-        {
-            playerSprite.color = new Color(playerSprite.color.r, playerSprite.color.g, playerSprite.color.b, 1f);
-            flashActive = false;
-        }
-        flashCounter -= Time.deltaTime;
+        startPos = transform.position;
+        _currentHealth = maxHealth;
+        // Panggil UI Manager untuk set health bar di awal (pastikan UIManager ada)
+        if (UIManager.MyInstance != null)
+            UIManager.MyInstance.SetHealthBarValue(_currentHealth, maxHealth);
     }
 
     public void HurtPlayer(int damageToGive)
     {
-        currentHealth -= damageToGive;
-        flashActive = true;
-        flashCounter = flashLength;
+        if (isInvincible) return; // Abaikan damage jika sedang kebal
 
-        Debug.Log("HurtPlayer called, currentHealth: " + currentHealth);
+        _currentHealth -= damageToGive;
+        _currentHealth = Mathf.Clamp(_currentHealth, 0, maxHealth);
 
-        UIManager.MyInstance.SetHealthBarValue(currentHealth); // Update health bar
+        if (audioSource != null && hurtSound != null)
+            audioSource.PlayOneShot(hurtSound);
 
-        if (currentHealth <= 0)
+        if (UIManager.MyInstance != null)
+            UIManager.MyInstance.SetHealthBarValue(_currentHealth, maxHealth);
+
+        if (_currentHealth <= 0)
         {
-            Debug.Log("Triggering player_death animation");
-            flashActive = false;  // Stop flashing
-            animator.SetTrigger("death");
-            StartCoroutine(WaitForDeathAnimation());
+            Die();
+        }
+        else
+        {
+            StartCoroutine(BecomeTemporarilyInvincible());
         }
     }
 
-    private IEnumerator WaitForDeathAnimation()
+    public void Heal(int healAmount)
     {
-        // Get the current animation state info
-        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        _currentHealth += healAmount;
+        _currentHealth = Mathf.Clamp(_currentHealth, 0, maxHealth);
 
-        // Wait until the death animation is finished
-        yield return new WaitForSeconds(stateInfo.length);
-
-        // Add additional delay
-        yield return new WaitForSeconds(respawnDelay);
-
-        // Call GameOver method on GameManager
-        GameManager.MyInstance.GameOver();
+        if (audioSource != null && healSound != null)
+            audioSource.PlayOneShot(healSound);
+        
+        if (UIManager.MyInstance != null)
+            UIManager.MyInstance.SetHealthBarValue(_currentHealth, maxHealth);
     }
 
-    public void Respawn()
+    private void Die()
+    {
+        isInvincible = true;
+        animator.SetTrigger("death");
+        // Proses selanjutnya (GameOver/Respawn) akan dipanggil oleh Animation Event
+    }
+    
+    // PENTING: Method ini harus Anda panggil dari Animation Event di frame terakhir animasi kematian
+    public void OnDeathAnimationFinished()
+    {
+        StartCoroutine(RespawnCoroutine());
+    }
+
+    private IEnumerator RespawnCoroutine()
+    {
+        yield return new WaitForSeconds(respawnDelay);
+        
+        if (GameManager.MyInstance != null)
+            GameManager.MyInstance.GameOver();
+    }
+    
+    public void RespawnPlayer()
     {
         transform.position = startPos;
-        currentHealth = maxHealth; // Reset currentHealth to maxHealth
-        Debug.Log("Player respawned.");
-        UIManager.MyInstance.SetHealthBarValue(currentHealth); // Update health bar
+        _currentHealth = maxHealth;
+        isInvincible = false;
+        animator.Play("player_idle"); // Paksa kembali ke animasi idle
+        if (UIManager.MyInstance != null)
+            UIManager.MyInstance.SetHealthBarValue(_currentHealth, maxHealth);
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private IEnumerator BecomeTemporarilyInvincible()
     {
-        Debug.Log("OnTriggerEnter2D called with " + collision.gameObject.name); // Debug line
-        if (collision.CompareTag("Health"))
+        isInvincible = true;
+        // Logika kedip yang jauh lebih simpel
+        for (float i = 0; i < invincibilityDuration; i += flashDelay * 2)
         {
-            Debug.Log("Collision with Health item detected"); // Debug line
-
-            // Putar suara jika ada AudioSource dan AudioClip
-            if (audioSource != null && healSound != null)
-            {
-                audioSource.PlayOneShot(healSound);
-            }
-
-            Heal(healthAmount);
-            collision.gameObject.SetActive(false);
+            playerSprite.color = new Color(1f, 1f, 1f, 0.5f); // Set transparan
+            yield return new WaitForSeconds(flashDelay);
+            playerSprite.color = Color.white; // Kembali normal
+            yield return new WaitForSeconds(flashDelay);
         }
-    }
-
-    private void Heal(float amount)
-    {
-        Debug.Log("Healing player by " + amount); // Debug line
-        int previousHealth = currentHealth; // Debug line
-        currentHealth += Mathf.RoundToInt(amount);
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        Debug.Log("Health changed from " + previousHealth + " to " + currentHealth); // Debug line
-        UIManager.MyInstance.SetHealthBarValue(currentHealth); // Update health bar
-    }
-
-    private void Awake()
-    {
-        currentHealth = maxHealth;
-    }
-
-    public void ResetHealth()
-    {
-        currentHealth = maxHealth;
-        UIManager.MyInstance.SetHealthBarValue(currentHealth);
+        isInvincible = false;
     }
 }

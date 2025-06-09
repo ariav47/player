@@ -63,7 +63,7 @@ public class SceneFader : MonoBehaviour
         HealthManager healthManager = FindObjectOfType<HealthManager>();
         if (healthManager != null)
         {
-            healthManager.ResetHealth();
+            healthManager.RespawnPlayer();
         }
     }
 }

@@ -20,15 +20,6 @@ public class HurtPlayer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        /*if(reloading)
-        {
-            waitToLoad -= Time.deltaTime;
-            if(waitToLoad <= 0)
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-            }
-        }*/
-
         if(isTouching)
         {
             waitToHurt -= Time.deltaTime;

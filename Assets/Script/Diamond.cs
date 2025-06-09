@@ -1,14 +1,23 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Diamond : Collectable
+// Tidak perlu menyertakan System.Collections atau System.Collections.Generic jika tidak dipakai
+public class Diamond : Collectable // Pastikan nama base class sudah benar (Collectible/Collectable)
 {
     [SerializeField] int diamondValue = 1;
 
-    protected override void Collected()
+    // PERBAIKAN: Tambahkan parameter 'GameObject playerObject' agar cocok dengan base class
+    protected override void Collected(GameObject playerObject)
     {
-        GameManager.MyInstance.AddDiamonds(diamondValue);
-        Destroy(this.gameObject);
+        // 1. Jalankan logika spesifik untuk diamond
+        // Pastikan Anda punya GameManager yang bisa diakses seperti ini
+        if (GameManager.MyInstance != null)
+        {
+            GameManager.MyInstance.AddDiamonds(diamondValue);
+        }
+
+        Debug.Log("Diamond collected! Value: " + diamondValue);
+
+        // 2. Panggil method Collected() dari base class untuk menjalankan logika umum (seperti Destroy)
+        base.Collected(playerObject);
     }
 }
