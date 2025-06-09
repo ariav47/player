@@ -186,26 +186,21 @@ public class EnemyController : MonoBehaviour
         if (collision.CompareTag("PlayerAttack"))
         {
             Debug.Log("Enemy hit by PlayerAttack!");
-        
+
             // Langkah 1: Dapatkan referensi ke skrip PlayerController dari objek yang menyerang kita
             PlayerController player = collision.GetComponentInParent<PlayerController>();
-        
+
             // Langkah 2: Lakukan pengecekan apakah player ditemukan
             if (player != null)
             {
-                // Langkah 3: Ambil nilai TotalDamage dari player dan bulatkan ke integer
-                int damageToTake = Mathf.RoundToInt(player.TotalDamage);
-                
-                // Langkah 4: Panggil method TakeDamage dengan nilai damage dari player
-                TakeDamage(damageToTake);
-        
-                Debug.Log("Enemy receiving " + damageToTake + " damage from Player.");
+                AttackResult attackResult = player.CalculateAttackDamage();
+                // Kirim hasil serangan ke musuh
+                TakeDamage(attackResult);
             }
             else
             {
                 // Ini adalah fallback jika PlayerController tidak ditemukan, bisa pakai damage default
                 Debug.LogWarning("PlayerAttack hit, but PlayerController component was not found in parents. Using default damage.");
-                TakeDamage(damageToTest);
             }
             if (uiManagerEnemy != null)
             {
@@ -217,17 +212,29 @@ public class EnemyController : MonoBehaviour
     [ContextMenu("Take Damage")]
     public void TakeDamage()
     {
-        TakeDamage(damageToTest);
+        AttackResult testAttack = new AttackResult { damage = damageToTest, isCritical = false };
+        TakeDamage(testAttack);
     }
 
-    public void TakeDamage(int damage)
+    // Ubah tipe input dari 'int damage' menjadi 'AttackResult attackResult'
+    public void TakeDamage(AttackResult attackResult)
     {
-        currentHealth -= damage;
-        Debug.Log("Enemy took damage, current health: " + currentHealth);
+        // Untuk mendapatkan angkanya, kita akses properti .damage dari struct
+        currentHealth -= attackResult.damage;
+
+        // Kita juga bisa menggunakan informasi .isCritical untuk feedback
+        Debug.Log("Enemy took " + attackResult.damage + " damage. Was critical: " + attackResult.isCritical);
+
+        // Di sini Anda bisa menambahkan logika feedback jika kritikal
+        // Misalnya, memunculkan teks damage berwarna kuning atau memainkan suara khusus
+        if (attackResult.isCritical)
+        {
+            // ... Logika feedback kritikal ...
+        }
 
         if (uiManagerEnemy != null)
         {
-            uiManagerEnemy.UpdateHealthBar(currentHealth, maxHealth); // Update health bar
+            uiManagerEnemy.UpdateHealthBar(currentHealth, maxHealth);
         }
 
         if (currentHealth <= 0)
@@ -235,10 +242,6 @@ public class EnemyController : MonoBehaviour
             Debug.Log("Calling Die method");
             Die();
         }
-
-#if UNITY_EDITOR
-        UnityEditor.EditorUtility.SetDirty(this);
-#endif
     }
 
     private void Die()

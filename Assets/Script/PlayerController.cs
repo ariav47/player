@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+ public struct AttackResult
+    {
+        public int damage;
+        public bool isCritical; 
+    }
+    
 public class PlayerController : MonoBehaviour
 {
     // --- Letakkan ini di bagian atas class PlayerController ---
@@ -10,6 +16,11 @@ public class PlayerController : MonoBehaviour
     public float baseDamage = 10f;
     [SerializeField] private float bonusDamage = 0f;
     public float TotalDamage { get { return baseDamage + bonusDamage; } }
+
+    [Header("Critical Hit Stats")]
+    [Range(0f, 1f)] // Membuat slider di Inspector dari 0 sampai 1
+    public float criticalChance = 0.2f; // Peluang 20% untuk kritikal
+    public float criticalMultiplier = 2f; // Damage akan menjadi 2x lipat saat kritikal
 
     public float runSpeed = 5f;
     Vector2 moveInput;
@@ -205,5 +216,29 @@ public class PlayerController : MonoBehaviour
 
         bonusDamage -= damageToAdd;
         Debug.Log("Buff selesai. Total Damage kembali ke normal: " + TotalDamage);
+    }
+
+    public AttackResult CalculateAttackDamage()
+    {
+        float damage = this.TotalDamage;
+        bool isCriticalHit = false;
+
+        // "Lempar dadu" dengan angka acak antara 0 dan 1
+        if (Random.value <= criticalChance)
+        {
+            // Jika angka acak lebih kecil atau sama dengan peluang kita, itu KRITIKAL!
+            isCriticalHit = true;
+            damage *= criticalMultiplier;
+            Debug.Log("CRITICAL HIT!");
+        }
+
+        // Siapkan hasilnya
+        AttackResult result = new AttackResult
+        {
+            damage = Mathf.RoundToInt(damage),
+            isCritical = isCriticalHit
+        };
+
+        return result;
     }
 }
