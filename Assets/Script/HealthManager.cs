@@ -50,8 +50,12 @@ public class HealthManager : MonoBehaviour
     {
         if (isInvincible) return; // Abaikan damage jika sedang kebal
 
+        int healthBefore = _currentHealth;
+
         _currentHealth -= damageToGive;
         _currentHealth = Mathf.Clamp(_currentHealth, 0, maxHealth);
+
+        Debug.Log("Player took " + damageToGive + " damage. Health changed from " + healthBefore + " to " + _currentHealth);
 
         if (audioSource != null && hurtSound != null)
             audioSource.PlayOneShot(hurtSound);
