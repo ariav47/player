@@ -14,6 +14,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private float animationDuration = 0.5f;
     [SerializeField] private Image diamondImage;
     [SerializeField] private Sprite[] diamondSprites;
+    [SerializeField] private GameObject gameOverPanel;
 
     private HealthManager healthMan;
     private static UIManager instance;
@@ -55,6 +56,10 @@ public class UIManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
         Debug.Log("Scene loaded: " + scene.name);
         ResetHealthBar();
         UpdateDiamondImage(scene.name);
@@ -130,6 +135,19 @@ public class UIManager : MonoBehaviour
     {
         winCondition.SetActive(false);
     }
+
+    public void ShowGameOverUI()
+{
+    Debug.Log("SUCCESS #3: UIManager.ShowGameOverUI() tercapai. Mengaktifkan panel...");
+    if (gameOverPanel != null)
+    {
+        gameOverPanel.SetActive(true);
+    }
+    else
+    {
+        Debug.LogError("GAGAL: Referensi 'gameOverPanel' di UIManager kosong (null)!");
+    }
+}
 
     private void UpdateDiamondImage(string sceneName)
     {

@@ -10,7 +10,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private string nextScene; // Next scene name
 
     private static GameManager instance;
-    public GameObject gameOverUI;
     [SerializeField] private SceneFader sceneFader;
 
     [SerializeField] private AudioClip diamondCollectSound; // Tambahkan referensi ke AudioClip melalui SerializeField
@@ -132,25 +131,24 @@ public class GameManager : MonoBehaviour
         }
     }
 
+   // Di dalam GameManager.cs
     public void GameOver()
     {
-        Debug.Log("GameOver method called"); // Tambahkan log ini
-        if (gameOverUI != null)
+        Debug.Log("GameOver method called in GameManager");
+
+        // Beri perintah ke UIManager untuk menampilkan layar Game Over
+        if (UIManager.MyInstance != null)
         {
-            Debug.Log("Activating gameOverUI"); // Tambahkan log ini
-            gameOverUI.SetActive(true);
+            UIManager.MyInstance.ShowGameOverUI();
         }
-        else
-        {
-            Debug.LogError("gameOverUI is not set in the inspector"); // Tambahkan log ini
-        }
+
         Time.timeScale = 0f; // Pause the game
     }
 
     public void RestartGame()
     {
         Time.timeScale = 1f; // Resume the game
-        gameOverUI.SetActive(false);
+        //gameOverUI.SetActive(false);
         SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Restart the current scene
 
         StartCoroutine(ResetHealthAfterSceneLoad()); // Reset health bar after the scene is loaded
@@ -166,7 +164,7 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f; // Resume the game
         SceneManager.LoadScene("Home"); // Replace "Home" with the actual name of your home scene
-        gameOverUI.SetActive(false);
+        //gameOverUI.SetActive(false);
         GameObject canvas = GameObject.Find("Canvas"); // Ganti "Canvas" dengan nama GameObject yang berisi UI yang ingin dinonaktifkan
         if (canvas != null)
         {
