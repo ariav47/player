@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
         }
         else if (instance != this)
         {
-            DestroyImmediate(gameObject);
+            Destroy(gameObject);
         }
 
         audioSource = GetComponent<AudioSource>(); // Inisialisasi AudioSource

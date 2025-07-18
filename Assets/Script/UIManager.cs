@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Image diamondImage;
     [SerializeField] private Sprite[] diamondSprites;
     [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private GameObject buffDurationPanel; // Panel induk untuk timer
+    [SerializeField] private TextMeshProUGUI buffDurationText; // Teks untuk angka timer
 
     private HealthManager healthMan;
     private static UIManager instance;
@@ -171,5 +173,24 @@ public class UIManager : MonoBehaviour
                 break;
         }
         Debug.Log("Diamond image updated to: " + diamondImage.sprite.name);
+    }
+
+    // Method untuk menampilkan atau menyembunyikan seluruh panel timer
+    public void ShowBuffTimer(bool status)
+    {
+        if (buffDurationPanel != null)
+        {
+            buffDurationPanel.SetActive(status);
+        }
+    }
+    
+    // Method untuk meng-update angka pada timer
+    public void UpdateBuffTimer(float timeRemaining)
+    {
+        if (buffDurationPanel != null && buffDurationPanel.activeSelf)
+        {
+            // Mathf.Ceil digunakan untuk membulatkan ke atas (misal: 9.8s -> 10s)
+            buffDurationText.text = Mathf.Ceil(timeRemaining).ToString();
+        }
     }
 }

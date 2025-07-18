@@ -77,7 +77,6 @@ public class PlayerController : MonoBehaviour
         audioSource = GetComponent<AudioSource>(); 
     }
 
-    // #################### PERBAIKAN DI SINI ####################
     private void FixedUpdate()
     {
         // Jika sedang menyerang, paksa berhenti total.
@@ -87,8 +86,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        // Jika sedang sliding, jangan lakukan apa-apa di FixedUpdate.
-        // Biarkan coroutine yang mengatur kecepatan.
         if (_isSliding)
         {
             return;
@@ -212,7 +209,33 @@ public class PlayerController : MonoBehaviour
         bonusDamage += damageToAdd;
         Debug.Log("DAMAGE UP! Total Damage: " + TotalDamage + " selama " + duration + " detik.");
 
-        yield return new WaitForSeconds(duration);
+            // 1. Tampilkan panel UI timer
+        if (UIManager.MyInstance != null)
+        {
+            UIManager.MyInstance.ShowBuffTimer(true);
+        }
+    
+        float timeLeft = duration;
+    
+        // 2. Lakukan countdown selama buff aktif
+        while (timeLeft > 0)
+        {
+            timeLeft -= Time.deltaTime;
+    
+            // 3. Update teks di UI setiap frame
+            if (UIManager.MyInstance != null)
+            {
+                UIManager.MyInstance.UpdateBuffTimer(timeLeft);
+            }
+    
+            yield return null; // Tunggu satu frame sebelum mengulang loop
+        }
+    
+        // 4. Setelah countdown selesai, sembunyikan kembali panel UI timer
+        if (UIManager.MyInstance != null)
+        {
+            UIManager.MyInstance.ShowBuffTimer(false);
+        }
 
         bonusDamage -= damageToAdd;
         Debug.Log("Buff selesai. Total Damage kembali ke normal: " + TotalDamage);
