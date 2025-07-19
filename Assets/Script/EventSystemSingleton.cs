@@ -1,19 +1,26 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.EventSystems; // Penting
 
 public class EventSystemSingleton : MonoBehaviour
 {
-    private static EventSystemSingleton instance;
+    // Properti statis untuk menyimpan satu-satunya instance
+    public static EventSystemSingleton Instance;
 
     private void Awake()
     {
-        if (instance == null)
+        // Jika belum ada instance utama...
+        if (Instance == null)
         {
-            instance = this;
+            // ...maka jadikan GameObject ini sebagai instance utama.
+            Instance = this;
+            // Dan jangan hancurkan saat pindah scene.
             DontDestroyOnLoad(gameObject);
         }
-        else
+        // Jika sudah ada instance utama dan itu bukan GameObject ini...
+        else if (Instance != this)
         {
+            // ...maka hancurkan GameObject ini karena ia adalah duplikat.
+            Debug.LogWarning("Duplicate EventSystem found and destroyed.");
             Destroy(gameObject);
         }
     }

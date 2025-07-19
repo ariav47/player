@@ -11,6 +11,14 @@ public class MainMenu : MonoBehaviour
 
     public AudioSource backgroundAudio; // Add this field for background audio
 
+    public static MainMenu MyInstance; // Ganti NAMA_SCRIPT dengan UIManager atau MainMenu
+
+    private void Awake()
+    {
+        // HANYA INI. Tidak ada DontDestroyOnLoad atau Destroy.
+        MyInstance = this;
+    }
+
     private void Start()
     {
         if (backgroundAudio != null && !backgroundAudio.isPlaying)
@@ -43,6 +51,7 @@ public class MainMenu : MonoBehaviour
 
     public void LevelGame()
     {
+        Debug.Log("PERINTAH: Memulai proses loading scene 'Level' SEKARANG...");
         SceneManager.LoadScene("Level");
     }
 
@@ -59,5 +68,20 @@ public class MainMenu : MonoBehaviour
     public void QuitGame()
     {
         SceneManager.LoadScene("Exit");
+    }
+
+    public void GoToLevel(string sceneName)
+    {
+        // Cek apakah LevelManager yang abadi ada
+        if (LevelManager.MyInstance != null)
+        {
+            // Perintahkan LevelManager untuk memuat scene yang diminta
+            LevelManager.MyInstance.LoadToScene(sceneName);
+        }
+        else
+        {
+            // Fallback jika LevelManager tidak ditemukan
+            Debug.LogError("LevelManager.MyInstance not found! Cannot load scene.");
+        }
     }
 }

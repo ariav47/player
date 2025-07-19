@@ -1,181 +1,157 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI txtDiamonds;
-    [SerializeField] private GameObject winCondition;
-    [SerializeField] private TextMeshProUGUI txtWinCondition;
+    // --- Singleton Instance (Non-Persisten) ---
+    public static UIManager MyInstance;
+
+    // --- Referensi ke Elemen UI (Diatur di Inspector per scene) ---
+    [Header("UI Elements")]
     [SerializeField] private Slider healthBar;
-    [SerializeField] private float animationDuration = 0.5f;
+    [SerializeField] private TextMeshProUGUI txtDiamonds;
+    [SerializeField] private GameObject winConditionPanel;
+    [SerializeField] private TextMeshProUGUI txtWinCondition;
     [SerializeField] private Image diamondImage;
-    [SerializeField] private Sprite[] diamondSprites;
     [SerializeField] private GameObject gameOverPanel;
-    [SerializeField] private GameObject buffDurationPanel; // Panel induk untuk timer
-    [SerializeField] private TextMeshProUGUI buffDurationText; // Teks untuk angka timer
+    [SerializeField] private GameObject buffDurationPanel;
+    [SerializeField] private TextMeshProUGUI buffDurationText;
+    
+    [Header("Assets")]
+    [SerializeField] private Sprite[] diamondSprites;
+    
+    [Header("Settings")]
+    [SerializeField] private float healthAnimationDuration = 0.5f;
 
     private HealthManager healthMan;
-    private static UIManager instance;
-
-    public static UIManager MyInstance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<UIManager>();
-            }
-            return instance;
-        }
-    }
+    private Coroutine healthAnimationCoroutine;
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else if (instance != this)
-        {
-            Destroy(gameObject);
-        }
+        Debug.Log("STATUS: Scene 'Level' SUDAH dimuat, method Awake() dari UIManager berjalan.");
+        // Menjadikan dirinya sebagai instance UTAMA untuk scene ini.
+        MyInstance = this;
     }
 
-    private void OnEnable()
+    // Method ini dipanggil oleh GameManager setiap kali scene dimuat
+    public void UpdateUIOnSceneLoad()
     {
-        SceneManager.sceneLoaded += OnSceneLoaded;
-    }
-
-    private void OnDisable()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
-
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        if (gameOverPanel != null)
-        {
-            gameOverPanel.SetActive(false);
-        }
-        Debug.Log("Scene loaded: " + scene.name);
-        ResetHealthBar();
-        UpdateDiamondImage(scene.name);
-        HideWinCondition(); // Pastikan win condition tersembunyi setiap kali scene dimuat ulang
-    }
-
-    void Start()
-    {
+        // Cari referensi ke HealthManager di scene ini
         healthMan = FindObjectOfType<HealthManager>();
-        if (healthMan != null)
+        
+        // Nonaktifkan panel-panel yang tidak seharusnya muncul di awal
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (winConditionPanel != null) winConditionPanel.SetActive(false);
+        if (buffDurationPanel != null) buffDurationPanel.SetActive(false);
+        
+        // Reset Health Bar
+        ResetHealthBar();
+
+        // Update gambar diamond sesuai nama scene
+        if (GameManager.MyInstance != null)
         {
-            healthBar.maxValue = healthMan.maxHealth;
-            healthBar.value = healthMan.CurrentHealth;
-        }
-        UpdateDiamondImage(SceneManager.GetActiveScene().name);
-    }
-
-    void Update()
-    {
-        if (healthMan != null && healthBar.value != healthMan.CurrentHealth)
-        {
-            StartCoroutine(AnimateHealthBar(healthMan.CurrentHealth));
+            UpdateDiamondImage(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
         }
     }
-
-    private IEnumerator AnimateHealthBar(float targetHealth)
-    {
-        float startHealth = healthBar.value;
-        float timer = 0f;
-
-        while (timer < animationDuration)
-        {
-            timer += Time.deltaTime;
-            healthBar.value = Mathf.Lerp(startHealth, targetHealth, timer / animationDuration);
-            yield return null;
-        }
-
-        healthBar.value = targetHealth;
-    }
-
-    public void SetHealthBarValue(int CurrentHealth, int maxHealth)
+    
+    // --- Method untuk Health Bar ---
+    public void SetHealthBarValue(int currentHealth, int maxHealth)
     {
         if (healthBar != null)
         {
-            // Atur nilai maksimum slider sesuai maxHealth
             healthBar.maxValue = maxHealth;
-            // Atur nilai slider saat ini
-            healthBar.value = CurrentHealth;
+            if (healthAnimationCoroutine != null)
+            {
+                StopCoroutine(healthAnimationCoroutine);
+            }
+            healthAnimationCoroutine = StartCoroutine(AnimateHealthBar(currentHealth));
         }
     }
-
+    
     public void ResetHealthBar()
     {
-        if (healthMan != null)
+        if (healthMan == null) healthMan = FindObjectOfType<HealthManager>();
+
+        if (healthMan != null && healthBar != null)
         {
             healthBar.maxValue = healthMan.maxHealth;
             healthBar.value = healthMan.CurrentHealth;
         }
     }
 
-    public void UpdateDiamondUI(int _diamonds, int _winCondition)
+    private System.Collections.IEnumerator AnimateHealthBar(float targetHealth)
     {
-        txtDiamonds.text = _diamonds + " / " + _winCondition;
+        float startHealth = healthBar.value;
+        float timer = 0f;
+        while (timer < healthAnimationDuration)
+        {
+            timer += Time.deltaTime;
+            healthBar.value = Mathf.Lerp(startHealth, targetHealth, timer / healthAnimationDuration);
+            yield return null;
+        }
+        healthBar.value = targetHealth;
+        healthAnimationCoroutine = null;
+    }
+    
+    // --- Method untuk UI Lainnya ---
+
+    public void UpdateDiamondUI(int diamonds, int winCondition)
+    {
+        if (txtDiamonds != null)
+        {
+            txtDiamonds.text = diamonds + " / " + winCondition;
+        }
     }
 
-    public void ShowWinCondition(int _diamonds, int _winCondition)
+    public void ShowWinCondition(int diamonds, int winCondition)
     {
-        winCondition.SetActive(true);
-        txtWinCondition.text = "You need " + (_winCondition - _diamonds) + " more items";
+        if (winConditionPanel != null && txtWinCondition != null)
+        {
+            winConditionPanel.SetActive(true);
+            txtWinCondition.text = "You need " + (winCondition - diamonds) + " more items";
+        }
     }
 
     public void HideWinCondition()
     {
-        winCondition.SetActive(false);
+        if (winConditionPanel != null)
+        {
+            winConditionPanel.SetActive(false);
+        }
     }
 
     public void ShowGameOverUI()
-{
-    Debug.Log("SUCCESS #3: UIManager.ShowGameOverUI() tercapai. Mengaktifkan panel...");
-    if (gameOverPanel != null)
     {
-        gameOverPanel.SetActive(true);
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
     }
-    else
-    {
-        Debug.LogError("GAGAL: Referensi 'gameOverPanel' di UIManager kosong (null)!");
-    }
-}
 
     private void UpdateDiamondImage(string sceneName)
     {
+        if (diamondImage == null || diamondSprites == null || diamondSprites.Length == 0) return;
+
         switch (sceneName)
         {
             case "Char":
-                if (diamondSprites.Length > 0)
-                    diamondImage.sprite = diamondSprites[0];
+                diamondImage.sprite = diamondSprites[0];
                 break;
             case "Level 2":
-                if (diamondSprites.Length > 1)
-                    diamondImage.sprite = diamondSprites[1];
+                if (diamondSprites.Length > 1) diamondImage.sprite = diamondSprites[1];
                 break;
             case "Level 3":
-                if (diamondSprites.Length > 2)
-                    diamondImage.sprite = diamondSprites[2];
+                if (diamondSprites.Length > 2) diamondImage.sprite = diamondSprites[2];
                 break;
             default:
-                if (diamondSprites.Length > 0)
-                    diamondImage.sprite = diamondSprites[0];
+                diamondImage.sprite = diamondSprites[0];
                 break;
         }
-        Debug.Log("Diamond image updated to: " + diamondImage.sprite.name);
     }
 
-    // Method untuk menampilkan atau menyembunyikan seluruh panel timer
+    // --- Method untuk Buff Timer ---
+    
     public void ShowBuffTimer(bool status)
     {
         if (buffDurationPanel != null)
@@ -183,13 +159,11 @@ public class UIManager : MonoBehaviour
             buffDurationPanel.SetActive(status);
         }
     }
-    
-    // Method untuk meng-update angka pada timer
+
     public void UpdateBuffTimer(float timeRemaining)
     {
         if (buffDurationPanel != null && buffDurationPanel.activeSelf)
         {
-            // Mathf.Ceil digunakan untuk membulatkan ke atas (misal: 9.8s -> 10s)
             buffDurationText.text = Mathf.Ceil(timeRemaining).ToString();
         }
     }

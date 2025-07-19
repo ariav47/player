@@ -1,184 +1,149 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    // --- Singleton Instance ---
+    public static GameManager MyInstance;
+
+    // --- References ---
+    [Tooltip("Referensi ke SceneFader di setiap scene, akan dicari otomatis.")]
+    private SceneFader sceneFader;
+    [Tooltip("Referensi ke UIManager yang aktif di scene saat ini, akan dicari otomatis.")]
+    public UIManager currentUIManager;
+
+    // --- Game State Variables ---
     private int collectedDiamonds;
-    [SerializeField] private int winCondition = 3;
-    [SerializeField] private string nextScene; // Next scene name
-
-    private static GameManager instance;
-    [SerializeField] private SceneFader sceneFader;
-
-    [SerializeField] private AudioClip diamondCollectSound; // Tambahkan referensi ke AudioClip melalui SerializeField
-    private AudioSource audioSource; // Tambahkan referensi ke AudioSource
-
-    public static GameManager MyInstance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindObjectOfType<GameManager>();
-
-                if (instance == null)
-                {
-                    GameObject singleton = new GameObject(typeof(GameManager).Name);
-                    instance = singleton.AddComponent<GameManager>();
-                    DontDestroyOnLoad(singleton); // Optional: Jika ingin tetap ada di antara pergantian scene
-                }
-            }
-            return instance;
-        }
-    }
+    private int winCondition;
+    
+    [Header("Audio")]
+    [SerializeField] private AudioClip diamondCollectSound;
+    private AudioSource audioSource;
 
     private void Awake()
     {
-        if (instance == null)
+        // Setup Singleton yang abadi (persistent)
+        if (MyInstance == null)
         {
-            instance = this;
-            DontDestroyOnLoad(gameObject); // Optional: Jika ingin tetap ada di antara pergantian scene
+            MyInstance = this;
+            DontDestroyOnLoad(gameObject);
         }
-        else if (instance != this)
+        else
         {
             Destroy(gameObject);
         }
 
-        audioSource = GetComponent<AudioSource>(); // Inisialisasi AudioSource
+        // Inisialisasi AudioSource
+        audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
         {
-            audioSource = gameObject.AddComponent<AudioSource>(); // Tambahkan AudioSource jika tidak ada
+            audioSource = gameObject.AddComponent<AudioSource>();
         }
     }
 
-    private void Start()
+    // Mendaftarkan method OnSceneLoaded agar berjalan setiap kali scene baru dimuat
+    private void OnEnable() { SceneManager.sceneLoaded += OnSceneLoaded; }
+    private void OnDisable() { SceneManager.sceneLoaded -= OnSceneLoaded; }
+
+    // Method ini berjalan setiap kali scene baru selesai dimuat
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        SetWinConditionForLevel();
-        UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
+        // Cari UIManager dan SceneFader yang baru di scene yang baru dimuat
+        currentUIManager = FindObjectOfType<UIManager>();
+        sceneFader = FindObjectOfType<SceneFader>();
+
+        // Memberi peringatan jika komponen penting tidak ditemukan
+        if (currentUIManager == null) 
+            Debug.LogError("FATAL ERROR: UIManager tidak ditemukan di scene: " + scene.name);
+        
+        // Memperbarui win condition untuk level saat ini
+        SetWinConditionForLevel(scene.name);
+
+        // Memberi perintah ke UIManager untuk memperbarui tampilannya
+        if(currentUIManager != null) 
+            currentUIManager.UpdateUIOnSceneLoad();
     }
 
-    private void SetWinConditionForLevel()
+    // Method untuk mengatur win condition berdasarkan nama scene
+    private void SetWinConditionForLevel(string sceneName)
     {
-        // Reset collected diamonds
-        collectedDiamonds = 0;
-
-        // Set win condition and next scene based on the current level
-        switch (SceneManager.GetActiveScene().name)
+        collectedDiamonds = 0; // Reset diamond setiap mulai level baru
+        switch (sceneName)
         {
             case "Char":
                 winCondition = 3;
-                nextScene = "Level 2";
                 break;
             case "Level 2":
                 winCondition = 5;
-                nextScene = "Level 3";
                 break;
             case "Level 3":
                 winCondition = 3;
-                nextScene = "Ending"; // Set next scene for level 3
                 break;
-            case "Ending":
-                winCondition = 0;
-                nextScene = "Home"; // Set next scene for level 3
+            default:
+                winCondition = 0; // Tidak ada win condition untuk scene lain
                 break;
-            // default:
-            //     winCondition = 3;
-            //     nextScene = "Char"; // Default next scene
-            //     break;
         }
-
-        Debug.Log("Current Scene: " + SceneManager.GetActiveScene().name + ", Win Condition: " + winCondition + ", Next Scene: " + nextScene);
-        UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
     }
 
-    public void AddDiamonds(int _diamonds)
+    // Method untuk menambah diamond, dipanggil oleh item diamond
+    public void AddDiamonds(int amount)
     {
-        collectedDiamonds += _diamonds;
-        UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
+        collectedDiamonds += amount;
+        if (currentUIManager != null)
+            currentUIManager.UpdateDiamondUI(collectedDiamonds, winCondition);
 
-        // Putar suara jika ada AudioSource dan AudioClip
         if (audioSource != null && diamondCollectSound != null)
-        {
             audioSource.PlayOneShot(diamondCollectSound);
-        }
-        else
-        {
-            if (audioSource == null)
-            {
-                Debug.LogError("AudioSource is not set.");
-            }
-            if (diamondCollectSound == null)
-            {
-                Debug.LogError("diamondCollectSound is not set.");
-            }
-        }
     }
-
-    public void Finish()
+    
+    // Method untuk memeriksa penyelesaian level, dipanggil oleh FinishPoint
+    public void CheckLevelCompletion(int requiredDiamonds, string sceneToLoad)
     {
-        Debug.Log("Finish method called");
-        if (collectedDiamonds >= winCondition)
+        if (collectedDiamonds >= requiredDiamonds)
         {
-            Debug.Log("Collected Items: " + collectedDiamonds + ". Loading " + nextScene);
-            sceneFader.FadeOutAndLoadScene(nextScene);
+            if (LevelManager.MyInstance != null)
+            {
+                // Coba unlock level berikutnya
+                string currentSceneName = SceneManager.GetActiveScene().name;
+                if (currentSceneName == "Char") LevelManager.MyInstance.UnlockNextLevel(1);
+                else if (currentSceneName == "Level 2") LevelManager.MyInstance.UnlockNextLevel(2);
+                else if (currentSceneName == "Level 3") LevelManager.MyInstance.UnlockNextLevel(3);
+            }
+            
+            if (sceneFader != null)
+                sceneFader.FadeOutAndLoadScene(sceneToLoad);
+            else
+                SceneManager.LoadScene(sceneToLoad);
         }
         else
         {
-            Debug.Log("Not enough Items. Collected: " + collectedDiamonds + " / " + winCondition);
-            UIManager.MyInstance.ShowWinCondition(collectedDiamonds, winCondition);
+            if (currentUIManager != null)
+                currentUIManager.ShowWinCondition(collectedDiamonds, requiredDiamonds);
         }
     }
 
-   // Di dalam GameManager.cs
+    // Method untuk menampilkan layar Game Over
     public void GameOver()
     {
-        Debug.Log("GameOver method called in GameManager");
-
-        // Beri perintah ke UIManager untuk menampilkan layar Game Over
-        if (UIManager.MyInstance != null)
-        {
-            UIManager.MyInstance.ShowGameOverUI();
-        }
-
-        Time.timeScale = 0f; // Pause the game
+        if (currentUIManager != null)
+            currentUIManager.ShowGameOverUI();
+        Time.timeScale = 0f;
     }
 
-    public void RestartGame()
+    // --- Getter Methods ---
+    public int GetCurrentCollectedDiamonds() { return collectedDiamonds; }
+    public int GetCurrentWinCondition() { return winCondition; }
+    
+    // --- Scene Management ---
+    public void RestartGame() 
     {
-        Time.timeScale = 1f; // Resume the game
-        //gameOverUI.SetActive(false);
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); // Restart the current scene
-
-        StartCoroutine(ResetHealthAfterSceneLoad()); // Reset health bar after the scene is loaded
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    private IEnumerator ResetHealthAfterSceneLoad()
+    public void LoadHomeScene() 
     {
-        yield return null; // Wait for the scene to fully load
-        UIManager.MyInstance.ResetHealthBar(); // Reset health bar value
-    }
-
-    public void LoadHomeScene()
-    {
-        Time.timeScale = 1f; // Resume the game
-        SceneManager.LoadScene("Home"); // Replace "Home" with the actual name of your home scene
-        //gameOverUI.SetActive(false);
-        GameObject canvas = GameObject.Find("Canvas"); // Ganti "Canvas" dengan nama GameObject yang berisi UI yang ingin dinonaktifkan
-        if (canvas != null)
-        {
-            canvas.SetActive(false);
-        }
-        else
-        {
-            Debug.LogWarning("Canvas object not found in Home scene.");
-        }
-    }
-
-    private void OnLevelWasLoaded(int level)
-    {
-        SetWinConditionForLevel();
-        UIManager.MyInstance.UpdateDiamondUI(collectedDiamonds, winCondition);
+        Time.timeScale = 1f;
+        SceneManager.LoadScene("Home"); // Pastikan nama scene menu utama Anda adalah "Home"
     }
 }
